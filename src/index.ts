@@ -1,4 +1,5 @@
 import Koa from 'koa';
+import 'dotenv/config'
 import bodyParser from 'koa-bodyparser';
 import { aiRouter } from '@routers'
 
