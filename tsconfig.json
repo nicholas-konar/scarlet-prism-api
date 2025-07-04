@@ -10,7 +10,8 @@
     "baseUrl": ".",
     "paths": {
       "@routers": ["src/routers/index.ts"],
-      "@controllers": ["src/controllers/index.ts"]
+      "@controllers": ["src/controllers/index.ts"],
+      "@logger": ["src/logger/index.ts"]
     }
   },
   "include": ["src"]
