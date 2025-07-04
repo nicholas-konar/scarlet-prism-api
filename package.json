@@ -1,0 +1,29 @@
+{
+  "name": "ScarletPrism",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Nicholas Konar",
+  "license": "none",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@koa/router": "^13.1.1",
+    "dotenv": "^17.0.1",
+    "koa": "^3.0.0",
+    "koa-bodyparser": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.3",
+    "@types/koa": "^2.15.0",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa__router": "^12.0.4",
+    "@types/node": "^24.0.10",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  }
+}
