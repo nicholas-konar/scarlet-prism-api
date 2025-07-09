@@ -1,7 +1,9 @@
 import Koa from 'koa';
 import 'dotenv/config'
+import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser';
 import { aiRouter } from '@routers'
+import log from '@logger'
 
 const app = new Koa();
 
@@ -12,8 +14,23 @@ app.use(async (ctx, next) => {
   } catch (err: any) {
     ctx.status = err.status || 500;
     ctx.body = { error: err.message };
+    log.error({ error: err.message, status: err.status })
   }
 });
+
+app.use(cors({
+  origin: '*',    // or '*' to allow any
+  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length'],
+}));
+
+app.use(async (ctx, next) => {
+  await next()
+  // this runs after all the downstream middleware (including routes)
+  // so ctx.response.headers now contains the CORS headers + any others
+  log.info({ path: ctx.path, status: ctx.status, headers: ctx.response.headers })
+})
 
 app.use(bodyParser());
 app.use(aiRouter.routes());

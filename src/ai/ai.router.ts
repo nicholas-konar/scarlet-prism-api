@@ -3,6 +3,6 @@ import { aiController } from "@controllers";
 
 const aiRouter = new Router({ prefix: '/ai' })
 
-aiRouter.get('/chat', aiController.chat)
+aiRouter.post('/chat', aiController.chat)
 
 export { aiRouter }
