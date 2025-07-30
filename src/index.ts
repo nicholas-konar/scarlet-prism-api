@@ -3,10 +3,11 @@ import "dotenv/config"
 import cors from "@koa/cors"
 import bodyParser from "koa-bodyparser"
 import { aiRouter } from "@routers"
-import log from "@logger"
+import { baseLogger } from "@logger"
 import redisClient from "./redis"
 
 const app = new Koa()
+const log = baseLogger.child({})
 
 // Global error handler
 app.use(async (ctx, next) => {
