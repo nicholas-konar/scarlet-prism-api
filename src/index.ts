@@ -1,5 +1,6 @@
 import Koa from "koa"
 import "dotenv/config"
+import "@events/subscribe"
 import cors from "@koa/cors"
 import bodyParser from "koa-bodyparser"
 import { aiRouter } from "@routers"
