@@ -29,7 +29,7 @@ export class InMemoryEventBus implements EventBus {
 
     async publish<K extends keyof Events>(event: K, context: Events[K]) {
         this.emitter.emit(event, context)
-        log.info({ msg: `emitting event ${event}`, event })
+        log.info({ msg: `${event} event`, event, context })
     }
 
     async subscribe<K extends keyof Events>(
@@ -38,7 +38,7 @@ export class InMemoryEventBus implements EventBus {
     ) {
         this.emitter.on(event, handler)
         log.info({
-            msg: "event subscribed",
+            msg: `subscribed ${handler.name || "anonymous"} fn to event ${event}`,
             event,
             handler: handler.name || "anonymous",
         })
@@ -50,7 +50,7 @@ export class InMemoryEventBus implements EventBus {
     ) {
         this.emitter.off(event, handler)
         log.info({
-            msg: "event unsubscribed",
+            msg: `unsubscribed ${handler.name || "anonymous"} fn from event ${event}`,
             event,
             handler: handler.name || "anonymous",
         })
