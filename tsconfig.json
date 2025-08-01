@@ -10,7 +10,9 @@
         "baseUrl": ".",
         "paths": {
             "@ai": ["src/ai/index.ts"],
+            "@ai/*": ["src/ai/*"],
             "@events": ["src/events/index.ts"],
+            "@events/*": ["src/events/*"],
             "@routers": ["src/routers/index.ts"],
             "@controllers": ["src/controllers/index.ts"],
             "@logger": ["src/logger/index.ts"]
