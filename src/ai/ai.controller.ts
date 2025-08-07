@@ -1,6 +1,8 @@
 import { Context } from "koa"
 import { AiService } from "./ai.service"
 import { baseLogger } from "@logger"
+import { eventBus } from "@events"
+import { AiChatEventPayload } from "./ai.interface"
 
 interface AiChatRequest {
     prompt: string
@@ -17,10 +19,14 @@ async function chat(ctx: Context) {
         Connection: "keep-alive",
     })
 
-    const log = baseLogger.child({ function: "ai.ctrl.chat" })
+    const userChat: AiChatEventPayload = {
+        conversationId,
+        role: "user",
+        text: prompt,
+    }
+    await eventBus.publish("ai.chat.user.prompt.submitted", userChat)
 
-    // save user prompt in convo history immediately
-    await AiService.saveChat(conversationId, "user", prompt)
+    const log = baseLogger.child({ function: "ai.ctrl.chat" })
 
     try {
         const stream = await AiService.getChatStream(prompt, conversationId)
@@ -31,14 +37,14 @@ async function chat(ctx: Context) {
                     ctx.res.write(`data: ${JSON.stringify(event.delta)}\n\n`)
                     break
                 case "response.output_text.done":
-                    await AiService.saveChat(
+                    const aiChat: AiChatEventPayload = {
                         conversationId,
-                        "assistant",
-                        event.text,
-                    )
-                    log.info(
-                        { event: "chat.response.output_text.done" },
-                        "AI chat response output text done.",
+                        role: "assistant",
+                        text: event.text,
+                    }
+                    eventBus.publish(
+                        "ai.chat.response.output_text.done",
+                        aiChat,
                     )
                     break
                 case "response.completed":
