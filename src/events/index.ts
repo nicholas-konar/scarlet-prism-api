@@ -5,7 +5,8 @@ import { baseLogger } from "@logger"
 const log = baseLogger.child({ module: "events" })
 
 interface Events {
-    "ai.chat.user.prompt.submitted": AiChatEventPayload
+    "ai.conversation.created": any
+    "ai.chat.prompt.submitted": AiChatEventPayload
     "ai.chat.response.output_text.done": AiChatEventPayload
     "ai.chat.response.completed": any
 }

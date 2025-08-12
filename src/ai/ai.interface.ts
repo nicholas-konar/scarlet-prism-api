@@ -12,3 +12,8 @@ export interface AiChatEventPayload {
     role: AiChatRole
     text: string
 }
+
+export interface AiConversationCreatedEventPayload {
+    conversationId: string
+    createdAt: number
+}

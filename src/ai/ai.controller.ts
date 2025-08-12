@@ -1,8 +1,24 @@
 import { Context } from "koa"
 import { AiService } from "./ai.service"
 import { baseLogger } from "@logger"
+import { v4 as uuid } from "uuid"
 import { eventBus } from "@events"
-import { AiChatEventPayload } from "./ai.interface"
+import {
+    AiChatEventPayload,
+    AiConversationCreatedEventPayload,
+} from "./ai.interface"
+
+async function create(ctx: Context) {
+    const conversationId = uuid()
+
+    await eventBus.publish("ai.conversation.created", {
+        conversationId,
+        createdAt: Date.now(),
+    } as AiConversationCreatedEventPayload)
+
+    ctx.status = 201
+    ctx.body = { conversationId }
+}
 
 interface AiChatRequest {
     prompt: string
@@ -10,7 +26,8 @@ interface AiChatRequest {
 }
 
 async function chat(ctx: Context) {
-    const { prompt, conversationId } = ctx.request.body as AiChatRequest
+    const conversationId = ctx.params.id
+    const { prompt } = ctx.request.body as AiChatRequest
 
     ctx.status = 200
     ctx.set({
@@ -19,17 +36,16 @@ async function chat(ctx: Context) {
         Connection: "keep-alive",
     })
 
-    const userChat: AiChatEventPayload = {
+    await eventBus.publish("ai.chat.prompt.submitted", {
         conversationId,
         role: "user",
         text: prompt,
-    }
-    await eventBus.publish("ai.chat.user.prompt.submitted", userChat)
+    } as AiChatEventPayload)
 
     const log = baseLogger.child({ function: "ai.ctrl.chat" })
 
     try {
-        const stream = await AiService.getChatStream(prompt, conversationId)
+        const stream = await AiService.createChatStream(prompt, conversationId)
 
         for await (const event of stream) {
             switch (event.type) {
@@ -37,15 +53,11 @@ async function chat(ctx: Context) {
                     ctx.res.write(`data: ${JSON.stringify(event.delta)}\n\n`)
                     break
                 case "response.output_text.done":
-                    const aiChat: AiChatEventPayload = {
+                    eventBus.publish("ai.chat.response.output_text.done", {
                         conversationId,
                         role: "assistant",
                         text: event.text,
-                    }
-                    eventBus.publish(
-                        "ai.chat.response.output_text.done",
-                        aiChat,
-                    )
+                    } as AiChatEventPayload)
                     break
                 case "response.completed":
                     const usage = event.response.usage
@@ -70,4 +82,4 @@ async function chat(ctx: Context) {
     }
 }
 
-export const aiController = { chat }
+export const aiController = { create, chat }
