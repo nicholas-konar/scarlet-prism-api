@@ -1,14 +1,14 @@
 import { EventEmitter } from "events"
-import { AiChatEventPayload } from "src/ai/ai.interface"
+import { AiChatEventPayload } from "@events/payload.interface"
 import { baseLogger } from "@logger"
 
 const log = baseLogger.child({ module: "events" })
 
 interface Events {
     "ai.conversation.created": any
-    "ai.chat.prompt.submitted": AiChatEventPayload
-    "ai.chat.response.output_text.done": AiChatEventPayload
-    "ai.chat.response.completed": any
+    "ai.prompt.submitted": AiChatEventPayload
+    "ai.response.output_text.done": AiChatEventPayload
+    "ai.response.completed": any
 }
 
 // auto-infer payload type based on event name

@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid"
 import {
     AiChatEventPayload,
     AiConversationCreatedEventPayload,
-} from "./ai.interface"
+} from "@events/payload.interface"
 import { baseLogger } from "@logger"
 
 const log = baseLogger.child({ module: "ai.service" })
@@ -19,6 +19,8 @@ async function createChatStream(promptText: string, conversationId: string) {
         const chat = JSON.parse(e)
         return { role: chat.role, content: chat.text }
     })
+
+    log.debug({ history }, "chat history:")
 
     const apiKey = process.env.OPENAI_API_KEY
     const client = new OpenAi({ apiKey })
@@ -54,10 +56,7 @@ async function updateConversationHistory(data: AiChatEventPayload) {
             text: data.text,
         }),
     )
-    log.info(
-        { event: "ai.chat.response.output_text.done", data },
-        "AI chat response output text done.",
-    )
+    log.debug({ data }, "conversation history updated")
 }
 
 export const AiService = {

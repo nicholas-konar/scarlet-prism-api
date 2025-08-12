@@ -6,7 +6,7 @@ import { eventBus } from "@events"
 import {
     AiChatEventPayload,
     AiConversationCreatedEventPayload,
-} from "./ai.interface"
+} from "@events/payload.interface"
 
 async function create(ctx: Context) {
     const conversationId = uuid()
@@ -36,7 +36,7 @@ async function chat(ctx: Context) {
         Connection: "keep-alive",
     })
 
-    await eventBus.publish("ai.chat.prompt.submitted", {
+    await eventBus.publish("ai.prompt.submitted", {
         conversationId,
         role: "user",
         text: prompt,
@@ -53,7 +53,7 @@ async function chat(ctx: Context) {
                     ctx.res.write(`data: ${JSON.stringify(event.delta)}\n\n`)
                     break
                 case "response.output_text.done":
-                    eventBus.publish("ai.chat.response.output_text.done", {
+                    eventBus.publish("ai.response.output_text.done", {
                         conversationId,
                         role: "assistant",
                         text: event.text,
