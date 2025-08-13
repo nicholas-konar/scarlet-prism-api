@@ -11,6 +11,8 @@
         "paths": {
             "@ai": ["src/ai/index.ts"],
             "@ai/*": ["src/ai/*"],
+            "@db": ["src/db/index.ts"],
+            "@db/*": ["src/db/*"],
             "@events": ["src/events/index.ts"],
             "@events/*": ["src/events/*"],
             "@routers": ["src/routers/index.ts"],
