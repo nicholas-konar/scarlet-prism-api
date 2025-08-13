@@ -45,7 +45,7 @@ async function chat(ctx: Context) {
     const log = baseLogger.child({ function: "ai.ctrl.chat" })
 
     try {
-        const stream = await AiService.createChatStream(prompt, conversationId)
+        const stream = await AiService.createChatStream(conversationId)
 
         for await (const event of stream) {
             switch (event.type) {
