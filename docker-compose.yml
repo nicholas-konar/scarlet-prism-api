@@ -1,0 +1,80 @@
+version: "3.9"
+name: scarlet-prism-api
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scarlet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-scarletprism}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scarlet} -d ${POSTGRES_DB:-scarletprism}"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "no"]  # ephemeral for dev
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI http://localhost:8025
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"  # http://localhost:8081
+    depends_on:
+      - redis
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # Prisma / DB
+      DATABASE_URL: postgres://${POSTGRES_USER:-scarlet}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-scarletprism}
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # Local SMTP (MailHog)
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Apply existing migrations automatically on boot (safe in dev)
+    command: >
+      sh -c "
+      yarn prisma migrate deploy &&
+      yarn dev:inside
+      "
+
+volumes:
+  pgdata:
