@@ -13,6 +13,8 @@
             "@ai/*": ["src/ai/*"],
             "@db": ["src/db/index.ts"],
             "@db/*": ["src/db/*"],
+            "@redis": ["src/redis"],
+            "@redis/*": ["src/redis/*"],
             "@events": ["src/events/index.ts"],
             "@events/*": ["src/events/*"],
             "@routers": ["src/routers/index.ts"],
