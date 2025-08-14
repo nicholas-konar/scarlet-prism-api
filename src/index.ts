@@ -1,11 +1,11 @@
 import Koa from "koa"
 import "dotenv/config"
 import "@events/subscribe"
+import "@redis"
 import cors from "@koa/cors"
 import bodyParser from "koa-bodyparser"
 import { aiRouter } from "@routers"
 import { baseLogger } from "@logger"
-import redisClient from "./redis"
 
 const app = new Koa()
 const log = baseLogger.child({})
@@ -44,18 +44,6 @@ app.use(async (ctx, next) => {
 app.use(bodyParser())
 app.use(aiRouter.routes())
 app.use(aiRouter.allowedMethods())
-
-redisClient.connect()
-
-process.on("SIGINT", async () => {
-    redisClient.destroy()
-    process.exit(0)
-})
-
-process.on("SIGTERM", async () => {
-    redisClient.destroy()
-    process.exit(0)
-})
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

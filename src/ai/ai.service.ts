@@ -1,5 +1,5 @@
 import OpenAi from "openai"
-import redisClient from "../redis"
+import redisClient from "@redis/redis.client"
 import { v4 as uuid } from "uuid"
 import {
     AiChatEventPayload,
