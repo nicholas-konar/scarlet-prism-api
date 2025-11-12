@@ -44,37 +44,5 @@ services:
     depends_on:
       - redis
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      # Prisma / DB
-      DATABASE_URL: postgres://${POSTGRES_USER:-scarlet}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-scarletprism}
-      # Redis
-      REDIS_URL: redis://redis:6379
-      # Local SMTP (MailHog)
-      SMTP_HOST: mailhog
-      SMTP_PORT: 1025
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    # Apply existing migrations automatically on boot (safe in dev)
-    command: >
-      sh -c "
-      yarn prisma migrate deploy &&
-      yarn dev:inside
-      "
-
 volumes:
   pgdata:
